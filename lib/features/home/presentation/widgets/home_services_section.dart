@@ -3,12 +3,19 @@ import 'package:flutter/material.dart';
 import '../../../mosques/presentation/pages/mosque_map_screen.dart';
 
 import 'home_service_card.dart';
+import '../models/user_role.dart';
+import '../pages/all_needs_screen.dart';
+import '../pages/riwaq_impact_screen.dart';
 
 class HomeServicesSection extends StatelessWidget {
-  const HomeServicesSection({super.key, this.onTabSelected});
+  const HomeServicesSection({
+    super.key,
+    this.onTabSelected,
+    required this.role,
+  });
 
   final ValueChanged<int>? onTabSelected;
-
+  final UserRole role;
   @override
   Widget build(BuildContext context) {
     const services = [
@@ -54,10 +61,22 @@ class HomeServicesSection extends StatelessWidget {
                 onTap: () {
                   if (index == 0) {
                     onTabSelected?.call(1);
+                  } else if (index == 1) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => AllNeedsScreen(role: role),
+                      ),
+                    );
                   } else if (index == 2) {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => const MosqueMapScreen(),
+                      ),
+                    );
+                  } else if (index == 3) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const RiwaqImpactScreen(),
                       ),
                     );
                   }

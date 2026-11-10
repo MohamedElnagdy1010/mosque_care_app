@@ -38,8 +38,7 @@ class HomeScreen extends StatelessWidget {
               HomeStatsSection(),
               Gap(20),
 
-              HomeServicesSection(onTabSelected: onTabSelected),
-
+              HomeServicesSection(onTabSelected: onTabSelected, role: role),
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 8.0,
