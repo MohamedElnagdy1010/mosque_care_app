@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/network/api_client.dart';
+import '../../data/models/home_statistics_model.dart';
+import '../../data/repositories/home_statistics_repository.dart';
+import '../cubit/home_statistics_cubit.dart';
 import 'home_stat_item.dart';
 
 class HomeStatsSection extends StatelessWidget {
@@ -7,30 +12,75 @@ class HomeStatsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const stats = [
-      (Icons.favorite_border, '300+', 'مسجد ضمن الخدمة'),
-      (Icons.list, '350+', 'احتياج مسجل'),
-      (Icons.mosque_outlined, '85+', 'خدمة منفذة'),
-      (Icons.person_outline_outlined, '4', 'برامج رئيسية'),
+    return BlocProvider(
+      create: (context) => HomeStatisticsCubit(
+        HomeStatisticsRepository(context.read<ApiClient>()),
+      )..loadStatistics(),
+      child: const _StatisticsContent(),
+    );
+  }
+}
+
+class _StatisticsContent extends StatelessWidget {
+  const _StatisticsContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HomeStatisticsCubit, HomeStatisticsState>(
+      builder: (context, state) {
+        final statistics = state.statistics;
+
+        final isLoading =
+            state.status == HomeStatisticsStatus.initial ||
+            state.status == HomeStatisticsStatus.loading;
+
+        if (isLoading && statistics == null) {
+          return const _StatsLoading();
+        }
+
+        if (statistics == null) {
+          return _StatsError(
+            onRetry: () => context.read<HomeStatisticsCubit>().loadStatistics(),
+          );
+        }
+
+        return _StatsValues(statistics: statistics);
+      },
+    );
+  }
+}
+
+class _StatsValues extends StatelessWidget {
+  const _StatsValues({required this.statistics});
+
+  final HomeStatisticsModel statistics;
+
+  @override
+  Widget build(BuildContext context) {
+    final stats = [
+      (
+        Icons.mosque_outlined,
+        statistics.approvedMosques.toString(),
+        'المساجد المعتمدة',
+      ),
+      (
+        Icons.list_alt_outlined,
+        statistics.registeredNeeds.toString(),
+        'الاحتياجات المسجلة',
+      ),
+      (
+        Icons.check_circle_outline,
+        statistics.completedServices.toString(),
+        'الخدمات المنجزة',
+      ),
+      (
+        Icons.volunteer_activism_outlined,
+        statistics.benefitedMosques.toString(),
+        'المساجد المستفيدة',
+      ),
     ];
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFD6A343).withValues(alpha: 0.3),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.brown.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return _StatsContainer(
       child: Row(
         textDirection: TextDirection.rtl,
         children: List.generate(stats.length * 2 - 1, (index) {
@@ -49,6 +99,99 @@ class HomeStatsSection extends StatelessWidget {
           );
         }),
       ),
+    );
+  }
+}
+
+class _StatsLoading extends StatelessWidget {
+  const _StatsLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return _StatsContainer(
+      child: Row(
+        children: List.generate(
+          4,
+          (_) => Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Column(
+                children: [
+                  _placeholder(24, 24),
+                  const SizedBox(height: 8),
+                  _placeholder(42, 18),
+                  const SizedBox(height: 8),
+                  _placeholder(double.infinity, 10),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _placeholder(double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFFECE6DC),
+        borderRadius: BorderRadius.circular(5),
+      ),
+    );
+  }
+}
+
+class _StatsError extends StatelessWidget {
+  const _StatsError({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return _StatsContainer(
+      child: Column(
+        children: [
+          const Icon(Icons.wifi_off_rounded, color: Color(0xFF795735)),
+          const SizedBox(height: 8),
+          const Text('تعذر تحميل الإحصائيات', textAlign: TextAlign.center),
+          TextButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded),
+            label: const Text('إعادة المحاولة'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatsContainer extends StatelessWidget {
+  const _StatsContainer({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFD6A343).withValues(alpha: 0.3),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.brown.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
     );
   }
 }

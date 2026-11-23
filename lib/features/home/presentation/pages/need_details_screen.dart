@@ -34,10 +34,6 @@ class NeedDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isImamWithoutMosque =
-        role == UserRole.imam &&
-        (assignedMosqueId == null || assignedMosqueId!.isEmpty);
-
     final category = NeedCategories.all.where(
       (category) => category.id == categoryId,
     );
@@ -73,17 +69,10 @@ class NeedDetailsScreen extends StatelessWidget {
         centerTitle: true,
         backgroundColor: const Color(0xFFFFF4E2),
       ),
-      bottomNavigationBar: isImamWithoutMosque || categoryId == null
+      bottomNavigationBar: categoryId == null
           ? null
           : ActiveNeedsSummary(itemCounts: itemCounts),
-      body: isImamWithoutMosque
-          ? const Center(
-              child: Text(
-                'لم يتم ربط حسابك بمسجد بعد',
-                textAlign: TextAlign.center,
-              ),
-            )
-          : items.isEmpty
+      body: items.isEmpty
           ? const Center(
               child: Padding(
                 padding: EdgeInsets.all(24),

@@ -13,17 +13,11 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: const Color(0xFFFFF4E2),
       elevation: 0,
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: true,
       toolbarHeight: 85,
       titleSpacing: 12,
       title: Row(
         children: [
-          // القائمة
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.menu_rounded, color: darkBrown),
-          ),
-
           // اسم التطبيق
           Column(
             mainAxisSize: MainAxisSize.min,

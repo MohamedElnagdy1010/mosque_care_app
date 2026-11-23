@@ -22,8 +22,10 @@ class _SplashScreenState extends State<SplashScreen>
   static const _hold = Duration(milliseconds: 250);
   static const _bg = Color(0xFFFAF8F3);
 
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: _total);
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: _total,
+  );
 
   // كل مرحلة = جزء من الزمن الكلي (0..1)
   late final Animation<double> _inner = _stage(0.00, 0.20);
@@ -35,21 +37,27 @@ class _SplashScreenState extends State<SplashScreen>
   // زوم إن ثم زوم أوت بسيط
   late final Animation<double> _zoom = TweenSequence<double>([
     TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 1.07)
-            .chain(CurveTween(curve: Curves.easeInOut)),
-        weight: 55),
+      tween: Tween(
+        begin: 1.0,
+        end: 1.07,
+      ).chain(CurveTween(curve: Curves.easeInOut)),
+      weight: 55,
+    ),
     TweenSequenceItem(
-        tween: Tween(begin: 1.07, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeInOut)),
-        weight: 45),
+      tween: Tween(
+        begin: 1.07,
+        end: 1.0,
+      ).chain(CurveTween(curve: Curves.easeInOut)),
+      weight: 45,
+    ),
   ]).animate(CurvedAnimation(parent: _c, curve: const Interval(0.80, 1.0)));
 
   bool _started = false;
 
   Animation<double> _stage(double a, double b) => CurvedAnimation(
-        parent: _c,
-        curve: Interval(a, b, curve: Curves.easeOutCubic),
-      );
+    parent: _c,
+    curve: Interval(a, b, curve: Curves.easeOutCubic),
+  );
 
   @override
   void didChangeDependencies() {
@@ -145,37 +153,68 @@ class _LogoPainter extends CustomPainter {
     _caret(canvas, kArabicNameBounds, arabic, rtl: true);
 
     // الاسم الإنجليزي: من اليسار لليمين.
-    _reveal(canvas, englishName, kEnglishNameBounds, kLogoText, english, _Dir.ltr);
+    _reveal(
+      canvas,
+      englishName,
+      kEnglishNameBounds,
+      kLogoText,
+      english,
+      _Dir.ltr,
+    );
   }
 
-  void _reveal(Canvas canvas, Path path, Rect b, Color color, double t, _Dir dir) {
+  void _reveal(
+    Canvas canvas,
+    Path path,
+    Rect b,
+    Color color,
+    double t,
+    _Dir dir,
+  ) {
     if (t <= 0) return;
     const pad = 2.0;
     final Rect clip;
     switch (dir) {
       case _Dir.up:
-        clip = Rect.fromLTRB(b.left - pad, b.bottom + pad - (b.height + 2 * pad) * t,
-            b.right + pad, b.bottom + pad);
+        clip = Rect.fromLTRB(
+          b.left - pad,
+          b.bottom + pad - (b.height + 2 * pad) * t,
+          b.right + pad,
+          b.bottom + pad,
+        );
       case _Dir.rtl:
-        clip = Rect.fromLTRB(b.right + pad - (b.width + 2 * pad) * t, b.top - pad,
-            b.right + pad, b.bottom + pad);
+        clip = Rect.fromLTRB(
+          b.right + pad - (b.width + 2 * pad) * t,
+          b.top - pad,
+          b.right + pad,
+          b.bottom + pad,
+        );
       case _Dir.ltr:
-        clip = Rect.fromLTRB(b.left - pad, b.top - pad,
-            b.left - pad + (b.width + 2 * pad) * t, b.bottom + pad);
+        clip = Rect.fromLTRB(
+          b.left - pad,
+          b.top - pad,
+          b.left - pad + (b.width + 2 * pad) * t,
+          b.bottom + pad,
+        );
     }
     canvas.save();
     canvas.clipRect(clip);
     canvas.drawPath(
-        path, Paint()..color = color..isAntiAlias = true);
+      path,
+      Paint()
+        ..color = color
+        ..isAntiAlias = true,
+    );
     // خط رفيع بنفس اللون يخفي أي فواصل شعرية بين القطع.
     canvas.drawPath(
-        path,
-        Paint()
-          ..color = color
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 0.8
-          ..strokeJoin = StrokeJoin.round
-          ..isAntiAlias = true);
+      path,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.8
+        ..strokeJoin = StrokeJoin.round
+        ..isAntiAlias = true,
+    );
     canvas.restore();
   }
 
@@ -184,7 +223,9 @@ class _LogoPainter extends CustomPainter {
     final x = b.right - b.width * t;
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-          Rect.fromLTWH(x - 1.5, b.top - 4, 3, b.height + 8), const Radius.circular(1.5)),
+        Rect.fromLTWH(x - 1.5, b.top - 4, 3, b.height + 8),
+        const Radius.circular(1.5),
+      ),
       Paint()..color = kLogoMiddle,
     );
   }

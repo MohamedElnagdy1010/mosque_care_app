@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../widgets/mosque_service_status_card.dart';
 import '../../../home/presentation/models/user_role.dart';
 import '../../domain/entities/mosque.dart';
 import '../../domain/entities/mosque_request.dart';
@@ -10,6 +11,8 @@ import '../../domain/entities/mosque_visit.dart';
 import '../widgets/mosque_info_card.dart';
 import '../widgets/mosque_last_visit_card.dart';
 import '../widgets/mosque_recent_requests_card.dart';
+
+import '../widgets/mosque_needs_card.dart';
 
 class MosqueDetailsScreen extends StatelessWidget {
   const MosqueDetailsScreen({
@@ -45,6 +48,25 @@ class MosqueDetailsScreen extends StatelessWidget {
 
     final showOperationalDetails =
         MosquePermissions.canViewOperationalDetails(role) && canViewMosque;
+
+    final districtName = neighborhood.trim();
+
+    final districtLabel = districtName.startsWith('حي ')
+        ? districtName
+        : 'حي $districtName';
+
+    final latitude = mosque?.latitude;
+    final longitude = mosque?.longitude;
+
+    final hasCoordinates =
+        latitude != null &&
+        longitude != null &&
+        latitude.isFinite &&
+        longitude.isFinite &&
+        latitude >= -90 &&
+        latitude <= 90 &&
+        longitude >= -180 &&
+        longitude <= 180;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF4E2),
@@ -91,7 +113,7 @@ class MosqueDetailsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'حي $neighborhood - المزاحمية',
+                          '$districtLabel - المزاحمية',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 14,
@@ -99,17 +121,16 @@ class MosqueDetailsScreen extends StatelessWidget {
                           ),
                         ),
 
-                        if (locationUrl != null && locationUrl!.isNotEmpty) ...[
+                        if (hasCoordinates) ...[
                           const SizedBox(height: 12),
 
                           TextButton.icon(
                             onPressed: () async {
-                              final uri = Uri.tryParse(locationUrl!);
-
-                              if (uri == null ||
-                                  !['https', 'http'].contains(uri.scheme)) {
-                                return;
-                              }
+                              final uri = Uri.https(
+                                'www.google.com',
+                                '/maps/search/',
+                                {'api': '1', 'query': '$latitude,$longitude'},
+                              );
 
                               try {
                                 final opened = await launchUrl(
@@ -162,6 +183,15 @@ class MosqueDetailsScreen extends StatelessWidget {
                         mosque?.registrationSource ?? 'غير محدد',
                     mosqueType: mosque?.mosqueType ?? 'غير محدد',
                   ),
+                  const SizedBox(height: 14),
+
+                  MosqueServiceStatusCard(
+                    serviceStatus: mosque?.serviceStatus,
+                    openNeedsCount: mosque?.openNeedsCount,
+                  ),
+                  const SizedBox(height: 14),
+
+                  MosqueNeedsCard(mosqueId: mosqueId),
 
                   // المعلومات التشغيلية: تظهر للأدوار المصرح لها فقط
                   if (showOperationalDetails) ...[

@@ -1,0 +1,185 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/network/api_client.dart';
+
+import '../../data/repositories/home_statistics_repository.dart';
+import '../cubit/home_statistics_cubit.dart';
+import '../../data/models/home_statistics_model.dart';
+import 'home_stat_item.dart';
+
+class HomeStatsSection extends StatelessWidget {
+  const HomeStatsSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => HomeStatisticsCubit(
+        HomeStatisticsRepository(context.read<ApiClient>()),
+      )..loadStatistics(),
+      child: const _StatisticsContent(),
+    );
+  }
+}
+
+class _StatisticsContent extends StatelessWidget {
+  const _StatisticsContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HomeStatisticsCubit, HomeStatisticsState>(
+      builder: (context, state) {
+        final statistics = state.statistics;
+        final loading =
+            state.status == HomeStatisticsStatus.loading ||
+            state.status == HomeStatisticsStatus.initial;
+
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFFD6A343).withValues(alpha: 0.3),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.brown.withValues(alpha: 0.08),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: loading && statistics == null
+              ? const _StatsLoading()
+              : statistics == null
+              ? _StatsError(
+                  message: state.errorMessage ?? 'تعذر عرض الإحصائيات.',
+                  onRetry: () =>
+                      context.read<HomeStatisticsCubit>().loadStatistics(),
+                )
+              : _StatsValues(statistics: statistics),
+        );
+      },
+    );
+  }
+}
+
+class _StatsValues extends StatelessWidget {
+  const _StatsValues({required this.statistics});
+
+  final HomeStatisticsModel statistics;
+
+  @override
+  Widget build(BuildContext context) {
+    final stats = [
+      (
+        Icons.mosque_outlined,
+        statistics.approvedMosques.toString(),
+        'المساجد المعتمدة',
+      ),
+      (
+        Icons.list_alt_outlined,
+        statistics.registeredNeeds.toString(),
+        'الاحتياجات المسجلة',
+      ),
+      (
+        Icons.check_circle_outline,
+        statistics.completedServices.toString(),
+        'الخدمات المنجزة',
+      ),
+      (
+        Icons.volunteer_activism_outlined,
+        statistics.benefitedMosques.toString(),
+        'المساجد المستفيدة',
+      ),
+    ];
+
+    return Row(
+      textDirection: TextDirection.rtl,
+      children: List.generate(stats.length * 2 - 1, (index) {
+        if (index.isOdd) {
+          return Container(
+            width: 1,
+            height: 48,
+            color: const Color(0xFFE5C99B),
+          );
+        }
+
+        final stat = stats[index ~/ 2];
+
+        return Expanded(
+          child: HomeStatItem(icon: stat.$1, value: stat.$2, label: stat.$3),
+        );
+      }),
+    );
+  }
+}
+
+class _StatsLoading extends StatelessWidget {
+  const _StatsLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: List.generate(
+        4,
+        (_) => Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: Column(
+              children: [
+                _placeholder(24, 24),
+                const SizedBox(height: 8),
+                _placeholder(42, 18),
+                const SizedBox(height: 8),
+                _placeholder(double.infinity, 10),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _placeholder(double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFFECE6DC),
+        borderRadius: BorderRadius.circular(5),
+      ),
+    );
+  }
+}
+
+class _StatsError extends StatelessWidget {
+  const _StatsError({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        children: [
+          const Icon(Icons.wifi_off_rounded, color: Color(0xFF795735)),
+          const SizedBox(height: 6),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12),
+          ),
+          TextButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded, size: 18),
+            label: const Text('إعادة المحاولة'),
+          ),
+        ],
+      ),
+    );
+  }
+}

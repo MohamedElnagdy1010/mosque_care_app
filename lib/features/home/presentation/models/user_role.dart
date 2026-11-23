@@ -1,7 +1,1 @@
-
-enum UserRole {
-  visitor,
-  imam,
-  supervisor,
-  ministry,
-}
+enum UserRole { visitor, authenticatedUser }

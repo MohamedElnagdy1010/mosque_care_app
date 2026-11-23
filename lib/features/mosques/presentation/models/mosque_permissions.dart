@@ -4,12 +4,8 @@ class MosquePermissions {
   const MosquePermissions._();
 
   static bool canViewOperationalDetails(UserRole role) {
-    return switch (role) {
-      UserRole.visitor => false,
-      UserRole.imam => true,
-      UserRole.supervisor => true,
-      UserRole.ministry => true,
-    };
+    // التفاصيل التشغيلية غير متاحة حتى تحديد صلاحياتها من API.
+    return false;
   }
 
   static bool canViewMosque({
@@ -17,11 +13,7 @@ class MosquePermissions {
     required String mosqueId,
     String? assignedMosqueId,
   }) {
-    return switch (role) {
-      UserRole.visitor => true,
-      UserRole.imam => assignedMosqueId == mosqueId,
-      UserRole.supervisor => true,
-      UserRole.ministry => true,
-    };
+    // قائمة المساجد المعتمدة متاحة للجميع.
+    return true;
   }
 }

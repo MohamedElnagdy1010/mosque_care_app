@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-
 import 'home_news_card.dart';
 import 'home_news_item.dart';
 

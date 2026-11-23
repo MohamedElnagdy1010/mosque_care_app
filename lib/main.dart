@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:mosque_care_app/role_selection_screen.dart';
+import 'session_gate.dart';
+import 'core/network/api_client.dart';
+import 'core/storage/token_storage.dart';
+import 'features/auth/data/datasources/auth_remote_data_source.dart';
+import 'features/auth/data/repositories/auth_repository_impl.dart';
+import 'features/auth/presentation/cubit/auth_cubit.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'splash_screen.dart';
@@ -8,8 +15,25 @@ import 'onboarding_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   final preferences = await SharedPreferences.getInstance();
-  runApp(KhademApp(preferences: preferences));
+  final tokenStorage = TokenStorage();
+  final apiClient = ApiClient(tokenStorage);
+
+  final authRepository = AuthRepositoryImpl(
+    remoteDataSource: AuthRemoteDataSource(apiClient),
+    tokenStorage: tokenStorage,
+  );
+
+  runApp(
+    RepositoryProvider<ApiClient>(
+      create: (_) => apiClient,
+      child: BlocProvider<AuthCubit>(
+        create: (_) => AuthCubit(authRepository),
+        child: KhademApp(preferences: preferences),
+      ),
+    ),
+  );
 }
 
 class KhademApp extends StatelessWidget {
@@ -30,9 +54,10 @@ class KhademApp extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: child ?? const SizedBox.shrink(),
     ),
+
     home: SplashScreen(
       nextBuilder: (_) => preferences.getBool('onboarding_complete') == true
-          ? RoleSelectionScreen()
+          ? const SessionGate()
           : OnboardingScreen(preferences: preferences),
     ),
   );

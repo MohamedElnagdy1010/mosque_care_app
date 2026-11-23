@@ -614,7 +614,6 @@ const String _englishNameData =
     '477.03 547.29 477.32 546.77 477.5 C 546.25 477.68 545.75 477.77 545.25 477.77 C 544.37 477.77 543.68 477.55 '
     '543.18 477.1 C 542.69 476.65 542.39 475.94 542.3 474.96 L 549.22 474.96 Z M 549.22 474.18 ';
 
-
 /// Parses the compact path data (absolute M / L / C / Z commands only).
 Path _parse(String data) {
   final path = Path();

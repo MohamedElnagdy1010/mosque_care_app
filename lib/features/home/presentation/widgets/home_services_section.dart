@@ -76,7 +76,7 @@ class HomeServicesSection extends StatelessWidget {
                   } else if (index == 3) {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => const RiwaqImpactScreen(),
+                        builder: (_) => RiwaqImpactScreen(role: role),
                       ),
                     );
                   }

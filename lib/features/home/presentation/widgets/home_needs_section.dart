@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../data/catalog/need_categories.dart';
 import 'home_need_card.dart';
 import '../models/user_role.dart';
-
-import '../pages/need_details_screen.dart';
 
 class HomeNeedsSection extends StatelessWidget {
   const HomeNeedsSection({super.key, required this.role});
@@ -63,22 +60,7 @@ class HomeNeedsSection extends StatelessWidget {
                     title: need.$1,
                     image: need.$2,
                     progress: need.$3,
-                    openBuilder: role == UserRole.supervisor
-                        ? (context) {
-                            final category = NeedCategories.all.firstWhere(
-                              (category) => category.id == need.$4,
-                            );
-
-                            return NeedDetailsScreen(
-                              title: need.$1,
-                              categoryId: category.id,
-                              items: category.items
-                                  .map((item) => item.name)
-                                  .toList(),
-                              role: role,
-                            );
-                          }
-                        : null,
+                    openBuilder: null,
                   ),
                 );
               },

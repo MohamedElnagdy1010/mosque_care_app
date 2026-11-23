@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class HomeServiceCard extends StatelessWidget {
@@ -27,15 +26,10 @@ class HomeServiceCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 4,
-            vertical: 12,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: gold.withValues(alpha: 0.35),
-            ),
+            border: Border.all(color: gold.withValues(alpha: 0.35)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -57,10 +51,7 @@ class HomeServiceCard extends StatelessWidget {
                 subtitle,
                 maxLines: 2,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Color(0xFF94785C),
-                  fontSize: 9,
-                ),
+                style: const TextStyle(color: Color(0xFF94785C), fontSize: 9),
               ),
             ],
           ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/user_role.dart';
 import '../models/role_action_item.dart';
 import 'role_action_card.dart';
+import '../../../requests/presentation/pages/service_request_screen.dart';
 
 class HomeRoleActionsSection extends StatelessWidget {
   const HomeRoleActionsSection({
@@ -17,121 +18,67 @@ class HomeRoleActionsSection extends StatelessWidget {
   static const Color gold = Color(0xFFD6A343);
 
   String get sectionTitle {
-    switch (role) {
-      case UserRole.visitor:
-        return 'خدمات الزائر';
-      case UserRole.imam:
-        return 'خدمات الإمام والمؤذن';
-      case UserRole.supervisor:
-        return 'خدمات مشرف الجمعية';
-      case UserRole.ministry:
-        return 'خدمات ممثل الوزارة';
-    }
+    return role == UserRole.visitor ? 'خدمات الزائر' : 'خدمات المستخدم';
   }
 
-  List<RoleActionItem> get actions {
-    switch (role) {
-      case UserRole.visitor:
-        return [
-          RoleActionItem(
-            title: 'استكشف المساجد',
-            icon: Icons.mosque_outlined,
-            onTap: () => onTabSelected?.call(1),
-          ),
-          RoleActionItem(
-            title: 'الاحتياجات',
-            icon: Icons.volunteer_activism_outlined,
-            onTap: () {},
-          ),
-          RoleActionItem(
-            title: 'الأخبار',
-            icon: Icons.article_outlined,
-            onTap: () {},
-          ),
-          RoleActionItem(
-            title: 'تواصل معنا',
-            icon: Icons.support_agent_outlined,
-            onTap: () {},
-          ),
-        ];
-
-      case UserRole.imam:
-        return [
-          RoleActionItem(
-            title: 'طلب خدمة',
-            icon: Icons.add_circle_outline,
-            onTap: () {},
-          ),
-          RoleActionItem(
-            title: 'طلباتي',
-            icon: Icons.assignment_outlined,
-            onTap: () {},
-          ),
-          RoleActionItem(
-            title: 'بيانات المسجد',
-            icon: Icons.mosque_outlined,
-            onTap: () {},
-          ),
-          RoleActionItem(
-            title: 'متابعة الصيانة',
-            icon: Icons.build_outlined,
-            onTap: () {},
-          ),
-        ];
-
-      case UserRole.supervisor:
-        return [
-          RoleActionItem(
-            title: 'جميع المساجد',
-            icon: Icons.mosque_outlined,
-            onTap: () {},
-          ),
-          RoleActionItem(
-            title: 'إنشاء بلاغ',
-            icon: Icons.note_add_outlined,
-            onTap: () {},
-          ),
-          RoleActionItem(
-            title: 'متابعة البلاغات',
-            icon: Icons.fact_check_outlined,
-            onTap: () {},
-          ),
-          RoleActionItem(
-            title: 'التوثيق الميداني',
-            icon: Icons.camera_alt_outlined,
-            onTap: () {},
-          ),
-        ];
-
-      case UserRole.ministry:
-        return [
-          RoleActionItem(
-            title: 'رفع دفعة مساجد',
-            icon: Icons.upload_file_outlined,
-            onTap: () {},
-          ),
-          RoleActionItem(
-            title: 'متابعة الدفعات',
-            icon: Icons.folder_outlined,
-            onTap: () {},
-          ),
-          RoleActionItem(
-            title: 'البلاغات',
-            icon: Icons.report_outlined,
-            onTap: () {},
-          ),
-          RoleActionItem(
-            title: 'الملاحظات',
-            icon: Icons.edit_note_outlined,
-            onTap: () {},
-          ),
-        ];
+  List<RoleActionItem> actions(BuildContext context) {
+    if (role == UserRole.visitor) {
+      return [
+        RoleActionItem(
+          title: 'استكشف المساجد',
+          icon: Icons.mosque_outlined,
+          onTap: () => onTabSelected?.call(1),
+        ),
+        RoleActionItem(
+          title: 'الاحتياجات',
+          icon: Icons.volunteer_activism_outlined,
+          onTap: () {},
+        ),
+        RoleActionItem(
+          title: 'الأخبار',
+          icon: Icons.article_outlined,
+          onTap: () {},
+        ),
+        RoleActionItem(
+          title: 'تواصل معنا',
+          icon: Icons.support_agent_outlined,
+          onTap: () {},
+        ),
+      ];
     }
+
+    return [
+      RoleActionItem(
+        title: 'المساجد',
+        icon: Icons.mosque_outlined,
+        onTap: () => onTabSelected?.call(1),
+      ),
+
+      RoleActionItem(
+        title: 'طلب خدمة',
+        icon: Icons.add_circle_outline,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const ServiceRequestScreen(),
+            ),
+          );
+        },
+      ),
+
+      RoleActionItem(
+        title: 'طلباتي',
+        icon: Icons.assignment_outlined,
+        onTap: () {},
+      ),
+      RoleActionItem(title: 'حسابي', icon: Icons.person_outline, onTap: () {}),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    final items = actions;
+    debugPrint('HOME ROLE: ${role.name}');
+    final items = actions(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),

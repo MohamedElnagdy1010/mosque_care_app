@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class RoleActionCard extends StatelessWidget {
@@ -25,25 +24,16 @@ class RoleActionCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 4,
-            vertical: 12,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: gold.withValues(alpha: 0.35),
-            ),
+            border: Border.all(color: gold.withValues(alpha: 0.35)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                size: 27,
-                color: darkBrown,
-              ),
+              Icon(icon, size: 27, color: darkBrown),
               const SizedBox(height: 8),
               Text(
                 title,
