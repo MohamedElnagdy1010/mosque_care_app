@@ -2,17 +2,27 @@ import 'package:flutter/material.dart';
 
 import '../../domain/entities/request_draft.dart';
 
+import 'package:image_picker/image_picker.dart';
+
+import 'request_need_photo_picker.dart';
+
 class RequestNeedDetailsCard extends StatelessWidget {
   const RequestNeedDetailsCard({
     super.key,
     required this.title,
     required this.need,
     required this.onChanged,
+
+    this.photo,
+    this.onPhotoChanged,
   });
 
   final String title;
   final RequestNeedDraft need;
   final ValueChanged<RequestNeedDraft> onChanged;
+
+  final XFile? photo;
+  final ValueChanged<XFile?>? onPhotoChanged;
 
   static const _brown = Color(0xFF4A2A16);
   static const _gold = Color(0xFFD6A343);
@@ -76,6 +86,11 @@ class RequestNeedDetailsCard extends StatelessWidget {
               onChanged(need.copyWith(notes: value));
             },
           ),
+
+          if (onPhotoChanged != null) ...[
+            const SizedBox(height: 14),
+            RequestNeedPhotoPicker(photo: photo, onChanged: onPhotoChanged!),
+          ],
         ],
       ),
     );

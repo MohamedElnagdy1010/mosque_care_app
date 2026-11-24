@@ -14,6 +14,10 @@ import '../../../mosques/data/repositories/remote_mosque_repository.dart';
 import '../../../mosques/presentation/cubit/mosques/mosques_cubit.dart';
 import '../../../mosques/presentation/pages/mosques_screen.dart';
 
+import '../widgets/request_selected_needs_section.dart';
+
+import 'package:image_picker/image_picker.dart';
+
 class ServiceRequestScreen extends StatelessWidget {
   const ServiceRequestScreen({super.key});
 
@@ -40,6 +44,8 @@ class _ServiceRequestContentState extends State<_ServiceRequestContent> {
   static const _gold = Color(0xFFD6A343);
 
   final Map<String, RequestNeedDraft> _selected = {};
+
+  final Map<String, XFile> _needPhotos = {};
 
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -78,6 +84,28 @@ class _ServiceRequestContentState extends State<_ServiceRequestContent> {
   }
 
   String _selectionKey(String category, String item) => '$category::$item';
+
+  void _updateNeed(RequestNeedDraft updatedNeed) {
+    final key = updatedNeed.selectionKey;
+
+    if (!_selected.containsKey(key)) return;
+
+    setState(() {
+      _selected[key] = updatedNeed;
+    });
+  }
+
+  void _updateNeedPhoto(String selectionKey, XFile? photo) {
+    if (!_selected.containsKey(selectionKey)) return;
+
+    setState(() {
+      if (photo == null) {
+        _needPhotos.remove(selectionKey);
+      } else {
+        _needPhotos[selectionKey] = photo;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +195,7 @@ class _ServiceRequestContentState extends State<_ServiceRequestContent> {
                   keyboardDismissBehavior:
                       ScrollViewKeyboardDismissBehavior.onDrag,
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  itemCount: categories.length + 1,
+                  itemCount: categories.length + 3,
                   itemBuilder: (context, index) {
                     if (index == 0) {
                       return Column(
@@ -234,8 +262,70 @@ class _ServiceRequestContentState extends State<_ServiceRequestContent> {
                       );
                     }
 
-                    final category = categories[index - 1];
+                    if (index == 1) {
+                      return const Padding(
+                        padding: EdgeInsets.only(top: 8, bottom: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '01 — اختيار الاحتياجات',
+                              style: TextStyle(
+                                fontSize: 19,
+                                fontWeight: FontWeight.bold,
+                                color: _brown,
+                              ),
+                            ),
+                            SizedBox(height: 6),
+                            Text(
+                              'اختر الخدمات المطلوبة من الأقسام التالية.',
+                              style: TextStyle(color: Color(0xFF8A7868)),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
 
+                    if (index == categories.length + 2) {
+                      if (_selected.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 18),
+                          const Divider(
+                            color: Color(0xFFD6A343),
+                            thickness: 1.5,
+                          ),
+                          const SizedBox(height: 14),
+                          const Text(
+                            '02 — الاحتياجات المختارة',
+                            style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                              color: _brown,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            'راجع احتياجاتك وحدد الأولوية والملاحظات لكل عنصر.',
+                            style: TextStyle(color: Color(0xFF8A7868)),
+                          ),
+                          const SizedBox(height: 16),
+
+                          RequestSelectedNeedsSection(
+                            categories: categories,
+                            selectedNeeds: _selected,
+                            onNeedChanged: _updateNeed,
+                            needPhotos: _needPhotos,
+                            onPhotoChanged: _updateNeedPhoto,
+                          ),
+                        ],
+                      );
+                    }
+                    final category = categories[index - 2];
                     return Card(
                       color: Colors.white,
                       margin: const EdgeInsets.only(bottom: 10),
@@ -281,6 +371,7 @@ class _ServiceRequestContentState extends State<_ServiceRequestContent> {
                                   );
                                 } else {
                                   _selected.remove(key);
+                                  _needPhotos.remove(key);
                                 }
                               });
                             },
