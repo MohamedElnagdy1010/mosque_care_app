@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/request_draft.dart';
 import '../../data/models/service_catalog_model.dart';
 
+import 'dart:io';
+
+import 'package:image_picker/image_picker.dart';
+
 class RequestReviewScreen extends StatelessWidget {
   const RequestReviewScreen({
     super.key,
@@ -10,6 +14,8 @@ class RequestReviewScreen extends StatelessWidget {
     required this.mosqueName,
     required this.mosqueNeighborhood,
     required this.categories,
+    required this.needPhotos,
+    this.onConfirm,
   });
 
   final RequestDraft draft;
@@ -19,6 +25,8 @@ class RequestReviewScreen extends StatelessWidget {
   static const _brown = Color(0xFF4A2A16);
   static const _gold = Color(0xFFD6A343);
 
+  final Map<String, XFile> needPhotos;
+  final VoidCallback? onConfirm;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,8 +109,37 @@ class RequestReviewScreen extends StatelessWidget {
                     children: [
                       _detailRow('الاحتياج', itemName),
                       _detailRow('الأولوية', priorityLabel),
+
                       if (need.notes.trim().isNotEmpty)
                         _detailRow('الملاحظات', need.notes),
+
+                      if (needPhotos[need.selectionKey] != null) ...[
+                        const Text(
+                          'صورة المشكلة',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF8A7868),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.file(
+                            File(needPhotos[need.selectionKey]!.path),
+                            width: double.infinity,
+                            height: 180,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Padding(
+                                padding: EdgeInsets.all(12),
+                                child: Text('تعذر عرض الصورة المرفقة.'),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+
                       const Divider(height: 20),
                     ],
                   );
@@ -112,6 +149,30 @@ class RequestReviewScreen extends StatelessWidget {
           }),
 
           const SizedBox(height: 24),
+
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: onConfirm,
+              icon: const Icon(Icons.send_rounded),
+              label: const Text(
+                'تأكيد وإرسال الطلب',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _brown,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: const Color(0xFFD6C9B8),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
           OutlinedButton.icon(
             onPressed: () => Navigator.of(context).pop(),
             icon: const Icon(Icons.edit_outlined),

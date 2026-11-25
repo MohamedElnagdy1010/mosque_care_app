@@ -18,6 +18,9 @@ import '../widgets/request_selected_needs_section.dart';
 
 import 'package:image_picker/image_picker.dart';
 
+import '../../data/models/service_catalog_model.dart';
+import 'request_review_screen.dart';
+
 class ServiceRequestScreen extends StatelessWidget {
   const ServiceRequestScreen({super.key});
 
@@ -105,6 +108,36 @@ class _ServiceRequestContentState extends State<_ServiceRequestContent> {
         _needPhotos[selectionKey] = photo;
       }
     });
+  }
+
+  void _reviewRequest(List<ServiceCatalogCategory> categories) {
+    final draft = RequestDraft(
+      supervisorName: _nameController.text,
+      supervisorPhone: _phoneController.text,
+      supervisorRole: _roleController.text,
+      mosqueId: int.tryParse(_selectedMosque?.id ?? '') ?? 0,
+      needs: _selected.values.toList(),
+    );
+
+    final error = draft.validate();
+
+    if (error != null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error)));
+      return;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => RequestReviewScreen(
+          draft: draft,
+          mosqueName: _selectedMosque!.name,
+          mosqueNeighborhood: _selectedMosque!.neighborhood,
+          categories: categories,
+          needPhotos: Map.of(_needPhotos),
+        ),
+      ),
+    );
   }
 
   @override
@@ -322,6 +355,27 @@ class _ServiceRequestContentState extends State<_ServiceRequestContent> {
                             needPhotos: _needPhotos,
                             onPhotoChanged: _updateNeedPhoto,
                           ),
+
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: () => _reviewRequest(categories),
+                              icon: const Icon(Icons.fact_check_outlined),
+                              label: const Text('مراجعة الطلب'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _brown,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
                         ],
                       );
                     }

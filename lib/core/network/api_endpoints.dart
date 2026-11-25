@@ -10,5 +10,6 @@ class ApiEndpoints {
   static const mosques = 'khadim/v1/mosques';
   static const catalog = 'khadim/v1/catalog';
   static const requests = 'khadim/v1/requests';
+  static const photos = 'khadim/v1/photos';
   static const statistics = 'khadim/v1/statistics';
 }
