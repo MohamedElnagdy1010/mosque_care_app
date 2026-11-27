@@ -21,6 +21,10 @@ import 'package:image_picker/image_picker.dart';
 import '../../data/models/service_catalog_model.dart';
 import 'request_review_screen.dart';
 
+import '../../data/repositories/request_photo_repository.dart';
+import '../../data/repositories/request_repository.dart';
+import '../../data/services/request_submission_service.dart';
+
 class ServiceRequestScreen extends StatelessWidget {
   const ServiceRequestScreen({super.key});
 
@@ -127,6 +131,15 @@ class _ServiceRequestContentState extends State<_ServiceRequestContent> {
       return;
     }
 
+    final apiClient = context.read<ApiClient>();
+
+    final submissionService = RequestSubmissionService(
+      photoRepository: RequestPhotoRepository(apiClient),
+      requestRepository: RequestRepository(apiClient),
+    );
+
+    final photos = Map<String, XFile>.of(_needPhotos);
+
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => RequestReviewScreen(
@@ -134,7 +147,27 @@ class _ServiceRequestContentState extends State<_ServiceRequestContent> {
           mosqueName: _selectedMosque!.name,
           mosqueNeighborhood: _selectedMosque!.neighborhood,
           categories: categories,
-          needPhotos: Map.of(_needPhotos),
+          needPhotos: photos,
+          onConfirm: () async {
+            final requestId = await submissionService.submit(
+              draft: draft,
+              needPhotos: photos,
+            );
+
+            if (mounted) {
+              setState(() {
+                _selected.clear();
+                _needPhotos.clear();
+                _selectedMosque = null;
+
+                _nameController.clear();
+                _phoneController.clear();
+                _roleController.clear();
+              });
+            }
+
+            return requestId;
+          },
         ),
       ),
     );

@@ -4,6 +4,8 @@ import '../models/user_role.dart';
 import '../models/role_action_item.dart';
 import 'role_action_card.dart';
 import '../../../requests/presentation/pages/service_request_screen.dart';
+import '../../../requests/presentation/pages/my_requests_screen.dart';
+import '../../../inventory/presentation/pages/inventory_screen.dart';
 
 class HomeRoleActionsSection extends StatelessWidget {
   const HomeRoleActionsSection({
@@ -37,7 +39,7 @@ class HomeRoleActionsSection extends StatelessWidget {
         RoleActionItem(
           title: 'الأخبار',
           icon: Icons.article_outlined,
-          onTap: () {},
+          onTap: () => onTabSelected?.call(3),
         ),
         RoleActionItem(
           title: 'تواصل معنا',
@@ -69,15 +71,27 @@ class HomeRoleActionsSection extends StatelessWidget {
       RoleActionItem(
         title: 'طلباتي',
         icon: Icons.assignment_outlined,
-        onTap: () {},
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const MyRequestsScreen()),
+          );
+        },
       ),
-      RoleActionItem(title: 'حسابي', icon: Icons.person_outline, onTap: () {}),
+
+      RoleActionItem(
+        title: 'توثيق الموجودات',
+        icon: Icons.inventory_2_outlined,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const InventoryScreen()),
+          );
+        },
+      ),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('HOME ROLE: ${role.name}');
     final items = actions(context);
 
     return Padding(
